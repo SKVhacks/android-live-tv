@@ -1,0 +1,30 @@
+@import "tailwindcss";
+.ring-breathe {
+  animation: ringOpacity 1.6s ease-in-out infinite;
+  
+}
+
+@keyframes ringOpacity {
+  0% {
+    box-shadow: 0 0 0 4px rgb(239 68 68 / 0);
+    
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgb(255, 255, 255);
+    border:0.5px solid black;
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgb(239 68 68 / 0);
+  }
+}
+
+
+
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out;
+}
+
