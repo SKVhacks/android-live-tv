@@ -4,7 +4,7 @@ export default function ChannelList({ item, focuse }) {
       className={`
         channel-card
         relative
-        min-w-[230px] h-[120px]
+        min-w-[210px] h-[120px]
         rounded-2xl
         bg-center bg-cover
         flex-shrink-0
