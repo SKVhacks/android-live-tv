@@ -132,15 +132,15 @@ return(
         <div className='relative h-screen w-screen bg-black text-white'>
             <img src={ytInfo.thumbnail} alt=""className='absolute h-screen w-screen'  />
             <div className={`absolute inset-0 bg-gradient-to-r from-gray-900 via-black/40 to-transparent }`}></div>
-            <div className='absolute top-25 left-15'>
-                <p className=' text-white text-1xl'>{links[index].category}</p>
-                <p className='text-white text-8xl font-bold mt-1'>{ytInfo.channel}</p>
-                <p className='text-white text-1.5xl mt-3 font-normal'>{ytInfo.title}</p>
+            <div className='absolute top-10 left-10'>
+                <p className=' text-white text-xl'>{links[index].category}</p>
+                <p className='text-white text-5xl font-bold mt-1'>{ytInfo.channel}</p>
+                <p className='text-white text-xl mt-2 font-normal'>{ytInfo.title}</p>
             </div>
             {/* card container */}
             <div className='absolute bottom-5  inset-x-0 '>
                <div className="relative w-full py-3 ">
-                <div className="flex gap-6 overflow-x-auto scroll-smooth  px-10 py-8 items-center [scrollbar-width:none] [-ms-overflow-style:none]">
+                <div className="flex gap-5 overflow-x-auto scroll-smooth  px-10 py-8 items-center [scrollbar-width:none] [-ms-overflow-style:none]">
                 {/* cards */}
                 {links.map((item, i )=>
                   <div key={i} ref={(el) => (cardRefs.current[i] = el)}>
