@@ -1,20 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
-import escapeSound from "../sound/close.mp3";
+import escape from "../sound/close.mp3";
 
-export default function Videoplayer() {
+let ytPlayer = null;
+
+export default function Watch() {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  const playerRef = useRef(null);
+  const escRef = useRef(null);
   const qualityIntervalRef = useRef(null);
-  const escAudioRef = useRef(null);
 
-  /* -------------------- LOAD YOUTUBE API -------------------- */
   useEffect(() => {
-    escAudioRef.current = new Audio(escapeSound);
-    escAudioRef.current.preload = "auto";
-
+    escRef.current = new Audio(escape);
+    escRef.current.preload = "auto";
     if (!window.YT) {
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
@@ -22,63 +20,70 @@ export default function Videoplayer() {
     }
 
     window.onYouTubeIframeAPIReady = () => loadPlayer();
+    if (window.YT && window.YT.Player) loadPlayer();
 
-    if (window.YT && window.YT.Player) {
-      loadPlayer();
-    }
+    // BACK BUTTON
+    const backHandler = (e) => {
+      if (e.key === "Backspace" || e.key === "Escape") {
+        escRef.current.currentTime = 0;
+        escRef.current.play();
+        
+        navigate("/");
+      }
+    };
+    window.addEventListener("keydown", backHandler);
 
+    // PLAY  PAUSE 
+    const playPauseHandler = (e) => {
+       const key = e.key || e.detail;
+      if (!ytPlayer) return;
+
+      
+      if (e.key === "Enter" || e.key === " " || e.key === "MediaPlayPause") {
+        const state = ytPlayer.getPlayerState();
+        const overlay = document.getElementById("pauseOverlay");
+        if (state === window.YT.PlayerState.PLAYING) {
+          ytPlayer.pauseVideo();
+          overlay.classList.remove("hidden");
+        } else {
+          ytPlayer.playVideo();
+          overlay.classList.add("hidden");
+        }
+      }
+    };
+    window.addEventListener("keydown", playPauseHandler);
+    window.addEventListener("dpad", playPauseHandler);
+
+    // CLEAN-UP
     return () => {
-      exitPlayer();
-    };
-  }, [id]);
-
-  /* -------------------- BACK / EXIT KEYS -------------------- */
-  useEffect(() => {
-    const handleBack = (e) => {
-      const backKeys = [
-        "Escape",
-        "Backspace",
-        "BrowserBack",
-        "GoBack"
-      ];
-
-      if (backKeys.includes(e.key)) {
-        e.preventDefault();
-        escAudioRef.current?.play();
-        exitPlayer();
-      }
-
-      // Play / Pause
-      if (
-        e.key === "Enter" ||
-        e.key === " " ||
-        e.key === "MediaPlayPause"
-      ) {
-        togglePlayPause();
-      }
+        window.removeEventListener("keydown", backHandler);
+        window.removeEventListener("keydown", playPauseHandler);
+        window.removeEventListener("dpad", playPauseHandler && backHandler);
+        // STOP quality forcing
+        if (qualityIntervalRef.current) {
+          clearInterval(qualityIntervalRef.current);
+          qualityIntervalRef.current = null;
+        }
+        if (ytPlayer) {
+          ytPlayer.destroy();
+          ytPlayer = null;
+        }
     };
 
-    window.addEventListener("keydown", handleBack);
-    return () => window.removeEventListener("keydown", handleBack);
-  }, []);
+  },[id, navigate]);
 
-  /* -------------------- LOAD PLAYER -------------------- */
   const loadPlayer = () => {
+    // if (ytPlayer) ytPlayer.destroy();
     if (!document.getElementById("ytplayer")) return;
 
-    if (playerRef.current) {
-      playerRef.current.stopVideo();
-      playerRef.current.destroy();
-      playerRef.current = null;
-    }
-
-    playerRef.current = new window.YT.Player("ytplayer", {
+    ytPlayer = new window.YT.Player("ytplayer", {
       videoId: id,
       width: "100%",
       height: "100%",
       playerVars: {
         autoplay: 1,
         controls: 0,
+        modestbranding: 1,
         rel: 0,
         fs: 0,
         playsinline: 1
@@ -86,99 +91,62 @@ export default function Videoplayer() {
       events: {
         onReady: (e) => {
           e.target.playVideo();
-          document
-            .getElementById("pauseOverlay")
-            ?.classList.add("hidden");
+           document.getElementById("pauseOverlay")?.classList.add("hidden");
         },
-
         onStateChange: (e) => {
+          //  Only force quality AFTER playback starts
           if (e.data === window.YT.PlayerState.PLAYING) {
             force1080p(e.target);
           }
         }
       }
     });
+
   };
 
-  /* -------------------- FORCE 1080P -------------------- */
-  const force1080p = (player) => {
-    if (qualityIntervalRef.current) return;
 
-    let attempts = 0;
-
-    qualityIntervalRef.current = setInterval(() => {
-      if (!playerRef.current) {
-        clearInterval(qualityIntervalRef.current);
-        qualityIntervalRef.current = null;
-        return;
-      }
-
-      const qualities = player.getAvailableQualityLevels();
-      console.log("Available:", qualities);
-
-      if (qualities.includes("hd1080")) {
-        player.setPlaybackQuality("hd1080");
-        player.setPlaybackQualityRange?.("hd1080");
-      }
-
-      attempts++;
-      if (attempts > 6) {
-        clearInterval(qualityIntervalRef.current);
-        qualityIntervalRef.current = null;
-      }
-    }, 1500);
-  };
-
-  /* -------------------- PLAY / PAUSE -------------------- */
-  const togglePlayPause = () => {
-    if (!playerRef.current) return;
-
-    const state = playerRef.current.getPlayerState();
-    const overlay = document.getElementById("pauseOverlay");
-
-    if (state === window.YT.PlayerState.PLAYING) {
-      playerRef.current.pauseVideo();
-      overlay?.classList.remove("hidden");
-    } else {
-      playerRef.current.playVideo();
-      overlay?.classList.add("hidden");
-    }
-  };
-
-  /* -------------------- EXIT PLAYER -------------------- */
-  const exitPlayer = () => {
-    if (qualityIntervalRef.current) {
+const force1080p = (player) => {
+  if (qualityIntervalRef.current) return; // prevent duplicates
+  let attempts = 0;
+  qualityIntervalRef.current = setInterval(() => {
+    // player already destroyed
+    if (!player || !ytPlayer) {
       clearInterval(qualityIntervalRef.current);
       qualityIntervalRef.current = null;
+      return;
     }
+  const qualities = player.getAvailableQualityLevels();
+    // console.log("Available:", qualities);
+  if (qualities.includes("hd1080")) {
+    player.setPlaybackQuality("hd1080");
+    player.setPlaybackQualityRange?.("hd1080");
+    console.log("✅ Forced 1080p");
+  attempts++;
+  if (attempts > 6) {
+    clearInterval(qualityIntervalRef.current);
+    qualityIntervalRef.current = null;
+  }}
+  }, 1500);
+};
 
-    if (playerRef.current) {
-      playerRef.current.stopVideo();
-      playerRef.current.destroy();
-      playerRef.current = null;
-    }
 
-    navigate(-1);
-  };
 
-  /* -------------------- UI -------------------- */
   return (
     <div className="w-screen h-screen bg-black relative">
       <div id="ytplayer" className="w-full h-full"></div>
-
-      {/* Pause Overlay */}
-      <div
-        id="pauseOverlay"
-        className="
-          hidden
-          absolute inset-0
-          flex items-center justify-center
-          text-white text-7xl
-          bg-black/40
-        "
-      >
-        ⏸
-      </div>
+      {/* Pause Overlay bg-black bg-opacity-40*/}
+    <div
+      id="pauseOverlay"
+      className="
+        hidden
+        absolute inset-0 flex items-center justify-center
+        text-white text-7xl
+        bg-opacity-90
+        transition-all duration-200
+      "
+    >
+      ⏸
+    </div>
     </div>
   );
 }
