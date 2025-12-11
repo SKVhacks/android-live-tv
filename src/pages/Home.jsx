@@ -138,7 +138,7 @@ return(
                 <p className='text-white text-base mt-2 font-normal'>{ytInfo.title}</p>
             </div>
             {/* card container */}
-            <div className='absolute bottom-3  inset-x-0 '>
+            <div className='absolute bottom-0  inset-x-0 '>
                <div className="relative w-full py-3 ">
                 <div className="flex gap-5 overflow-x-auto scroll-smooth  px-10 py-8 items-center [scrollbar-width:none] [-ms-overflow-style:none]">
                 {/* cards */}

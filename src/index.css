@@ -11,7 +11,6 @@
   }
   50% {
     box-shadow: 0 0 0 4px rgb(255, 255, 255);
-    border:0.5px solid black;
   }
   100% {
     box-shadow: 0 0 0 4px rgb(239 68 68 / 0);
