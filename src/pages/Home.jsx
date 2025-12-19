@@ -1,30 +1,30 @@
 import react,{useState , useEffect , useRef} from 'react';
 import ChannelList from './ChannelList';
 import links from '../data/links.json'
-import next from '../sound/change.m4a'
-import okie1 from '../sound/okie.m4a'
+// import next from '../sound/change.m4a'
+// import okie1 from '../sound/okie.m4a'
 import { useNavigate } from "react-router-dom";
 
 export default function Home(){
   const cardRefs = useRef([]);
-  const moveSoundRef = useRef(null);
-  const okSoundRef = useRef(null);
+  // const moveSoundRef = useRef(null);
+  // const okSoundRef = useRef(null);
   
-  const playMoveSound = () => {
-    const audio = moveSoundRef.current;
-    if (!audio) return;
-      audio.pause();
-      audio.currentTime = 0;
-      audio.play();
-  };
+  // const playMoveSound = () => {
+  //   const audio = moveSoundRef.current;
+  //   if (!audio) return;
+  //     audio.pause();
+  //     audio.currentTime = 0;
+  //     audio.play();
+  // };
 
-  const playOkSound = () => {
-    const audio = okSoundRef.current;
-    if (!audio) return;
-      audio.pause();
-      audio.currentTime = 0;
-      audio.play();
-  };
+  // const playOkSound = () => {
+  //   const audio = okSoundRef.current;
+  //   if (!audio) return;
+  //     audio.pause();
+  //     audio.currentTime = 0;
+  //     audio.play();
+  // };
 
   const [ytInfo, setYtInfo] = useState({
     title: "",
@@ -68,23 +68,23 @@ export default function Home(){
   const[index,setIndex]=useState(0);
   
   useEffect(()=>{
-    moveSoundRef.current = new Audio(next);
-    okSoundRef.current = new Audio(okie1);
-    moveSoundRef.current.preload = "auto";
-    okSoundRef.current.preload = "auto";
+    // moveSoundRef.current = new Audio(next);
+    // okSoundRef.current = new Audio(okie1);
+    // moveSoundRef.current.preload = "auto";
+    // okSoundRef.current.preload = "auto";
     const keydetect = (e) =>{
     const key = e.key || e.detail;
     if (e.key==="Enter"){
-      playOkSound();
+      // playOkSound();
     }
     setIndex(old=>{
       let i=old;
       if (e.key === "ArrowRight" && i< links.length-1){
-        playMoveSound();
+        // playMoveSound();
         i++;
       }
       if (e.key==="ArrowLeft" &&  i > 0){
-        playMoveSound();
+        // playMoveSound();
         i--;
       }
       return i;
