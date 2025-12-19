@@ -1,18 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
-import escape from "../sound/close.mp3";
+// import escape from "../sound/close.mp3";
 
 let ytPlayer = null;
 
 export default function Watch() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const escRef = useRef(null);
+  // const escRef = useRef(null);
   const qualityIntervalRef = useRef(null);
 
   useEffect(() => {
-    escRef.current = new Audio(escape);
-    escRef.current.preload = "auto";
+    // escRef.current = new Audio(escape);
+    // escRef.current.preload = "auto";
     if (!window.YT) {
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
@@ -25,8 +25,8 @@ export default function Watch() {
     // BACK BUTTON
     const backHandler = (e) => {
       if (e.key === "Backspace" || e.key === "Escape") {
-        escRef.current.currentTime = 0;
-        escRef.current.play();
+        // escRef.current.currentTime = 0;
+        // escRef.current.play();
         
         navigate("/");
       }
