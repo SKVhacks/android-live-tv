@@ -14,6 +14,34 @@
   "logo": "/assets/logo/1.jpg",
   "category": "தமிழ்  News"
   },
+  {
+  "id": "j1nzTy5q_1Y",
+  "url":"https://www.youtube.com/live/j1nzTy5q_1Y?si=cNR_o3L_qFhGTwYu",
+  "title": "Thanthi TV",
+  "logo": "/assets/logo/7.jpg",
+  "category": "தமிழ்  News"
+  },
+   {
+  "id": "nfbOn2WpARo",
+  "url":"https://www.youtube.com/live/nfbOn2WpARo?si=nuOLzqwmuj0hMaH-",
+  "title": "malaimurasu live",
+  "logo": "/assets/logo/12.jpg",
+  "category": "தமிழ்  News"
+  },
+  {
+  "id": "g_7IQn8BDro",
+  "url":"https://www.youtube.com/live/g_7IQn8BDro?si=N-5dW_W_2dSV9Gj7",
+  "title": "Kalaigar news",
+  "logo": "/assets/logo/11.jpg",
+  "category": "தமிழ்  News"
+  },
+  {
+  "id": "gynWNinqmjw",
+  "url":"https://www.youtube.com/live/gynWNinqmjw?si=dQKk8tWO6W6zrq4d",
+  "title": "News 24/7 live",
+  "logo": "/assets/logo/10.jpg",
+  "category": "தமிழ்  News"
+  },
    {
   "id": "Q_vjY2-enZw",
   "url":"https://www.youtube.com/live/Q_vjY2-enZw?si=3Xw3KcgwtOeDsx4s",
@@ -35,15 +63,9 @@
   "logo": "/assets/logo/6.jpg",
   "category": "தமிழ்  News"
   },
+   
    {
-  "id": "j1nzTy5q_1Y",
-  "url":"https://www.youtube.com/live/j1nzTy5q_1Y?si=cNR_o3L_qFhGTwYu",
-  "title": "Thanthi TV",
-  "logo": "/assets/logo/7.jpg",
-  "category": "தமிழ்  News"
-  },
-   {
-  "id": "Y4SRabNHzDM",
+  "id": "M9GmdNl5hlI",
   "url":"https://www.youtube.com/live/Y4SRabNHzDM?si=iWxHPHKB3mLBFmY3",
   "title": "News J Live",
   "logo": "/assets/logo/8.jpg",
@@ -56,27 +78,7 @@
   "logo": "/assets/logo/9.jpg",
   "category": "தமிழ்  News"
   },
-  {
-  "id": "gynWNinqmjw",
-  "url":"https://www.youtube.com/live/gynWNinqmjw?si=dQKk8tWO6W6zrq4d",
-  "title": "News 24/7 live",
-  "logo": "/assets/logo/10.jpg",
-  "category": "தமிழ்  News"
-  },
-   {
-  "id": "g_7IQn8BDro",
-  "url":"https://www.youtube.com/live/g_7IQn8BDro?si=N-5dW_W_2dSV9Gj7",
-  "title": "Kalaigar news",
-  "logo": "/assets/logo/11.jpg",
-  "category": "தமிழ்  News"
-  },
-   {
-  "id": "nfbOn2WpARo",
-  "url":"https://www.youtube.com/live/nfbOn2WpARo?si=nuOLzqwmuj0hMaH-",
-  "title": "malaimurasu live",
-  "logo": "/assets/logo/12.jpg",
-  "category": "தமிழ்  News"
-  },
+  
    {
   "id": "8kfBSF0gMpI",
   "url":"https://www.youtube.com/live/8kfBSF0gMpI?si=1-Lq_3B6ggOkTKEK",
@@ -85,7 +87,7 @@
   "category": "தமிழ்  News"
   },
    {
-  "id": "HITWE_2aHk8",
+  "id": "ALGOOV5AOJ8",
   "url":"https://www.youtube.com/live/HITWE_2aHk8?si=_c6rhdLtuccD5UCs",
   "title": "jaya news live",
   "logo": "/assets/logo/14.jpg",
