@@ -1,5 +1,8 @@
 #!/usr/bin/env node
-
+import https from 'https';             // ✅ Works
+import fs from 'fs';                   // ✅ Works
+import path from 'path';               // ✅ Works
+import { fileURLToPath } from 'url';   // ✅ Works
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
