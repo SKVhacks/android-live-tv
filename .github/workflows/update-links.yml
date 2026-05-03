@@ -1,0 +1,65 @@
+name: Update YouTube Tamil News Links
+
+on:
+  schedule:
+    # Run every day at 6:00 AM UTC (11:30 AM IST)
+    - cron: '0 6 * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  update-links:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Run YouTube links update
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: node scripts/youtube-fetcher.js
+      
+      - name: Check if links.json changed
+        id: check_changes
+        run: |
+          if git diff --quiet src/data/links.json; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add src/data/links.json
+          git commit -m "chore: update youtube tamil news links - $(date +'%Y-%m-%d %H:%M:%S')"
+          git push
+      
+      - name: Create release/tag
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          TAG="links-update-$(date +'%Y%m%d-%H%M%S')"
+          git tag $TAG
+          git push origin $TAG
+      
+      - name: Notify - No changes
+        if: steps.check_changes.outputs.changed == 'false'
+        run: |
+          echo "✅ No new channels found. Existing links are up to date."
