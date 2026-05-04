@@ -1,4 +1,4 @@
-name: Update YouTube Tamil Live News Links
+name: Update YouTube Tamil Live News Links123
 
 on:
   schedule:
@@ -102,7 +102,7 @@ jobs:
                       if channel_id not in EXISTING_CHANNELS:
                           continue
 
-                      if not title.upper().startswith("🔴LIVE"):
+                      if not title.upper().startswith("🔴 LIVE"):
                           continue
 
                       return {
