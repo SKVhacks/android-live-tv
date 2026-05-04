@@ -1,0 +1,287 @@
+name: Update YouTube Tamil News Links
+
+on:
+  schedule:
+    - cron: '30 0 * * *'  # 6:00 AM IST
+  workflow_dispatch:
+
+jobs:
+  update-links:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Create directories
+        run: |
+          mkdir -p scripts
+          mkdir -p src/data
+
+      - name: Create fetcher script
+        run: |
+          cat > scripts/youtube_fetcher.py << 'SCRIPT_EOF'
+          #!/usr/bin/env python3
+
+          import json
+          import os
+          import sys
+          from pathlib import Path
+          from urllib.request import urlopen
+          from urllib.parse import urlencode
+          from datetime import datetime, timedelta
+
+          YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+
+          # 🔥 SEARCH FOR YOUR SPECIFIC CHANNELS
+          SEARCH_QUERIES = [
+              'Polimer News live',
+              'Sun News live',
+              'Thanthi TV live',
+              'malaimurasu live',
+              'Kalaigar news live',
+              'News 24/7 live tamil',
+              'News 7 Tamil live',
+              'News 18 Tamil Nadu live',
+              'Puthiya Thalaimurai live',
+              'News J Live'
+          ]
+
+          EXISTING_CHANNELS = {
+              '6xCrWQEcJZM': {'title': 'Polimer News', 'logo': '/assets/logo/aa.png'},
+              '9M02G5c6x6w': {'title': 'Sun News', 'logo': '/assets/logo/1.jpg'},
+              '8kjza8MzPXE': {'title': 'Thanthi TV', 'logo': '/assets/logo/7.jpg'},
+              'uXuh15qCgGo': {'title': 'malaimurasu live', 'logo': '/assets/logo/12.jpg'},
+              'g_7IQn8BDro': {'title': 'Kalaigar news', 'logo': '/assets/logo/11.jpg'},
+              'gynWNinqmjw': {'title': 'News 24/7 live', 'logo': '/assets/logo/10.jpg'},
+              'X_p2Z8NAq5U': {'title': 'News 7 Tamil', 'logo': '/assets/logo/4.jpg'},
+              'iZ6nFcBTMh4': {'title': 'News 18 Tamil Nadu', 'logo': '/assets/logo/5.jpg'},
+              'VNzHENanD0g': {'title': 'Puthiya Thalaimurai', 'logo': '/assets/logo/6.jpg'},
+              'cQSnvl4DqwY': {'title': 'News J Live', 'logo': '/assets/logo/8.jpg'},
+              'NHqqu4SbhZI': {'title': 'zee live', 'logo': '/assets/logo/9.jpg'}
+          }
+
+          def make_request(url):
+              try:
+                  with urlopen(url, timeout=10) as response:
+                      return json.loads(response.read().decode('utf-8'))
+              except Exception as e:
+                  print(f"ERROR: {e}")
+                  return None
+
+          def search_channels(query):
+              if not YOUTUBE_API_KEY:
+                  return []
+              try:
+                  params = urlencode({
+                      'part': 'snippet',
+                      'q': query,
+                      'type': 'channel',
+                      'maxResults': 5,
+                      'key': YOUTUBE_API_KEY,
+                  })
+                  url = f'https://www.googleapis.com/youtube/v3/search?{params}'
+                  data = make_request(url)
+                  return data.get('items', []) if data else []
+              except:
+                  return []
+
+          def get_channel_info(channel_id):
+              if not YOUTUBE_API_KEY:
+                  return None
+              try:
+                  params = urlencode({
+                      'part': 'snippet,statistics',
+                      'id': channel_id,
+                      'key': YOUTUBE_API_KEY
+                  })
+                  url = f'https://www.googleapis.com/youtube/v3/channels?{params}'
+                  data = make_request(url)
+                  return data['items'][0] if data and 'items' in data and data['items'] else None
+              except:
+                  return None
+
+          def get_recent_uploads(channel_id):
+              if not YOUTUBE_API_KEY:
+                  return []
+              try:
+                  params = urlencode({
+                      'part': 'contentDetails',
+                      'id': channel_id,
+                      'key': YOUTUBE_API_KEY
+                  })
+                  url = f'https://www.googleapis.com/youtube/v3/channels?{params}'
+                  data = make_request(url)
+                  
+                  if not data or 'items' not in data or len(data['items']) == 0:
+                      return []
+                  
+                  uploads_id = data['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+                  
+                  params = urlencode({
+                      'part': 'snippet',
+                      'playlistId': uploads_id,
+                      'maxResults': 10,
+                      'key': YOUTUBE_API_KEY,
+                  })
+                  url = f'https://www.googleapis.com/youtube/v3/playlistItems?{params}'
+                  data = make_request(url)
+                  
+                  return data.get('items', []) if data else []
+              except:
+                  return []
+
+          def has_recent_broadcast(channel_id):
+              try:
+                  videos = get_recent_uploads(channel_id)
+                  
+                  if not videos:
+                      return False
+                  
+                  five_days_ago = datetime.utcnow() - timedelta(days=5)
+                  
+                  for video in videos:
+                      try:
+                          pub_date = datetime.fromisoformat(video['snippet']['publishedAt'].replace('Z', '+00:00'))
+                          if pub_date > five_days_ago:
+                              return True
+                      except:
+                          continue
+                  
+                  return False
+              except:
+                  return False
+
+          print("\n" + "="*60)
+          print("🚀 YOUTUBE TAMIL NEWS LINKS UPDATE")
+          print("="*60 + "\n")
+
+          try:
+              # Keep existing
+              links = []
+              for ch_id, info in EXISTING_CHANNELS.items():
+                  links.append({
+                      'id': ch_id,
+                      'url': f'https://www.youtube.com/live/{ch_id}?si=updated',
+                      'title': info['title'],
+                      'logo': info['logo'],
+                      'category': 'தமிழ் News'
+                  })
+              
+              print(f"✅ EXISTING: {len(links)} channels added\n")
+
+              # Search specific channels
+              if YOUTUBE_API_KEY:
+                  print("🔍 SEARCHING FOR SPECIFIC CHANNELS\n")
+                  
+                  existing_ids = set(EXISTING_CHANNELS.keys())
+                  new_count = 0
+                  checked_titles = set()
+                  
+                  for query in SEARCH_QUERIES:
+                      if query in checked_titles:
+                          continue
+                      checked_titles.add(query)
+                      
+                      print(f"   🔎 Searching: {query}")
+                      results = search_channels(query)
+                      print(f"      Found: {len(results)} results")
+                      
+                      for item in results:
+                          ch_id = item['snippet']['channelId']
+                          
+                          if ch_id in existing_ids:
+                              print(f"         ⏭️  {ch_id} (already in list)")
+                              continue
+                          
+                          info = get_channel_info(ch_id)
+                          if not info:
+                              print(f"         ❌ Could not fetch info")
+                              continue
+                          
+                          title = info['snippet']['title']
+                          print(f"         📺 Checking: {title}")
+                          
+                          if not has_recent_broadcast(ch_id):
+                              print(f"            ❌ No broadcasts in last 5 days")
+                              continue
+                          
+                          print(f"            ✨ ADDED! (Recent broadcasts)")
+                          links.append({
+                              'id': ch_id,
+                              'url': f'https://www.youtube.com/live/{ch_id}?si=updated',
+                              'title': title,
+                              'logo': f'/assets/logo/{abs(hash(ch_id)) % 12 + 1}.jpg',
+                              'category': 'தமிழ் News'
+                          })
+                          existing_ids.add(ch_id)
+                          new_count += 1
+                  
+                  print(f"\n📝 NEW: Found {new_count} new channels\n")
+              else:
+                  print("⚠️  NO API KEY - Skipping search\n")
+
+              # Deduplicate
+              seen = {}
+              for link in links:
+                  if link['id'] not in seen:
+                      seen[link['id']] = link
+              
+              final = sorted(seen.values(), key=lambda x: x['title'])
+
+              # SAVE FILE
+              Path('src/data').mkdir(parents=True, exist_ok=True)
+              with open('src/data/links.json', 'w', encoding='utf-8') as f:
+                  json.dump(final, f, indent=2, ensure_ascii=False)
+              
+              print(f"💾 SAVED: {len(final)} channels\n")
+              print("📊 CHANNEL LIST:")
+              for i, link in enumerate(final, 1):
+                  print(f"   {i}. {link['title']}")
+              
+              print("\n" + "="*60)
+              print("✅ UPDATE COMPLETE")
+              print("="*60 + "\n")
+              
+          except Exception as e:
+              print(f"\n❌ ERROR: {e}")
+              import traceback
+              traceback.print_exc()
+              sys.exit(1)
+          SCRIPT_EOF
+
+      - name: Run update
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python3 scripts/youtube_fetcher.py
+
+      - name: Check changes
+        id: check
+        run: |
+          if git diff --quiet src/data/links.json 2>/dev/null; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.email "bot@github.com"
+          git config user.name "bot"
+          git add src/data/links.json
+          git commit -m "chore: update links $(date +'%Y-%m-%d')"
+          git push
+
+      - name: Tag
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git tag "update-$(date +'%Y%m%d-%H%M%S')"
+          git push origin --tags
