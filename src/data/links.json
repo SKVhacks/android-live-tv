@@ -1,81 +1,100 @@
 [
   {
-  "id":"6xCrWQEcJZM",
-  "url":"https://www.youtube.com/live/6xCrWQEcJZM?si=rUvgOKtRGPxw7oGi",
-  "title": "Polimer News",
-  "logo": "/assets/logo/aa.png",
-  "category": "தமிழ்  News"
-  
-  },
-   {
-  "id": "9M02G5c6x6w",
-  "url":"https://www.youtube.com/live/9M02G5c6x6w?si=_E0zlU3weU7ljPhf",
-  "title": "Sun News",
-  "logo": "/assets/logo/1.jpg",
-  "category": "தமிழ்  News"
+    "id": "g_7IQn8BDro",
+    "url": "https://www.youtube.com/live/g_7IQn8BDro?si=updated",
+    "title": "Kalaigar news",
+    "logo": "/assets/logo/11.jpg",
+    "category": "தமிழ் News"
   },
   {
-  "id": "8kjza8MzPXE",
-  "url":"https://www.youtube.com/live/8kjza8MzPXE?si=35oKfMTGJMzxIrP3",
-  "title": "Thanthi TV",
-  "logo": "/assets/logo/7.jpg",
-  "category": "தமிழ்  News"
-  },
-   {
-  "id": "uXuh15qCgGo",
-  "url":"https://www.youtube.com/live/uXuh15qCgGo?si=uogakdSBgr5bsiS2",
-  "title": "malaimurasu live",
-  "logo": "/assets/logo/12.jpg",
-  "category": "தமிழ்  News"
+    "id": "iZ6nFcBTMh4",
+    "url": "https://www.youtube.com/live/iZ6nFcBTMh4?si=updated",
+    "title": "News 18 Tamil Nadu",
+    "logo": "/assets/logo/5.jpg",
+    "category": "தமிழ் News"
   },
   {
-  "id": "g_7IQn8BDro",
-  "url":"https://www.youtube.com/live/g_7IQn8BDro?si=3J6IoLuO3ctJMfRb",
-  "title": "Kalaigar news",
-  "logo": "/assets/logo/11.jpg",
-  "category": "தமிழ்  News"
+    "id": "gynWNinqmjw",
+    "url": "https://www.youtube.com/live/gynWNinqmjw?si=updated",
+    "title": "News 24/7 live",
+    "logo": "/assets/logo/10.jpg",
+    "category": "தமிழ் News"
   },
   {
-  "id": "gynWNinqmjw",
-  "url":"https://www.youtube.com/live/gynWNinqmjw?si=UjGwXNaQ3Mm-UNJ-",
-  "title": "News 24/7 live",
-  "logo": "/assets/logo/10.jpg",
-  "category": "தமிழ்  News"
+    "id": "X_p2Z8NAq5U",
+    "url": "https://www.youtube.com/live/X_p2Z8NAq5U?si=updated",
+    "title": "News 7 Tamil",
+    "logo": "/assets/logo/4.jpg",
+    "category": "தமிழ் News"
   },
-   {
-  "id": "X_p2Z8NAq5U",
-  "url":"https://www.youtube.com/live/X_p2Z8NAq5U?si=T6VDUQjJxfHtsZjI",
-  "title": "News 7 Tamil",
-  "logo": "/assets/logo/4.jpg",
-  "category": "Tamil News"
+  {
+    "id": "cQSnvl4DqwY",
+    "url": "https://www.youtube.com/live/cQSnvl4DqwY?si=updated",
+    "title": "News J Live",
+    "logo": "/assets/logo/8.jpg",
+    "category": "தமிழ் News"
   },
-   {
-  "id": "iZ6nFcBTMh4",
-  "url":"https://www.youtube.com/live/iZ6nFcBTMh4?si=r12Co5prbHc6yIaT",
-  "title": "News 18 Tamil Nadu",
-  "logo": "/assets/logo/5.jpg",
-  "category": "தமிழ்  News"
+  {
+    "id": "UCat88i6_rELqI_prwvjspRA",
+    "url": "https://www.youtube.com/live/UCat88i6_rELqI_prwvjspRA?si=updated",
+    "title": "News18 Tamil Nadu",
+    "logo": "/assets/logo/6.jpg",
+    "category": "தமிழ் News"
   },
-   {
-  "id": "VNzHENanD0g",
-  "url":"https://www.youtube.com/live/VNzHENanD0g?si=-ZU1o7zfBpVhcGU3",
-  "title": "Puthiya Thalaimurai",
-  "logo": "/assets/logo/6.jpg",
-  "category": "தமிழ்  News"
+  {
+    "id": "UCGyZswzm4G-wEfRQHgMSAuw",
+    "url": "https://www.youtube.com/live/UCGyZswzm4G-wEfRQHgMSAuw?si=updated",
+    "title": "News7 Tamil",
+    "logo": "/assets/logo/2.jpg",
+    "category": "தமிழ் News"
   },
-   
-   {
-  "id": "cQSnvl4DqwY",
-  "url":"https://www.youtube.com/live/cQSnvl4DqwY?si=Bvv1INnM8Ci0D63r",
-  "title": "News J Live",
-  "logo": "/assets/logo/8.jpg",
-  "category": "தமிழ்  News"
+  {
+    "id": "UCtbo6_eDG7zEtaOtcSltJkA",
+    "url": "https://www.youtube.com/live/UCtbo6_eDG7zEtaOtcSltJkA?si=updated",
+    "title": "NewsTamil 24X7",
+    "logo": "/assets/logo/2.jpg",
+    "category": "தமிழ் News"
   },
-   {
-  "id": "NHqqu4SbhZI",
-  "url":"https://www.youtube.com/live/NHqqu4SbhZI?si=DZAcKlqFfBszU_ul",
-  "title": "zee live",
-  "logo": "/assets/logo/9.jpg",
-  "category": "தமிழ்  News"
+  {
+    "id": "6xCrWQEcJZM",
+    "url": "https://www.youtube.com/live/6xCrWQEcJZM?si=updated",
+    "title": "Polimer News",
+    "logo": "/assets/logo/aa.png",
+    "category": "தமிழ் News"
+  },
+  {
+    "id": "VNzHENanD0g",
+    "url": "https://www.youtube.com/live/VNzHENanD0g?si=updated",
+    "title": "Puthiya Thalaimurai",
+    "logo": "/assets/logo/6.jpg",
+    "category": "தமிழ் News"
+  },
+  {
+    "id": "9M02G5c6x6w",
+    "url": "https://www.youtube.com/live/9M02G5c6x6w?si=updated",
+    "title": "Sun News",
+    "logo": "/assets/logo/1.jpg",
+    "category": "தமிழ் News"
+  },
+  {
+    "id": "8kjza8MzPXE",
+    "url": "https://www.youtube.com/live/8kjza8MzPXE?si=updated",
+    "title": "Thanthi TV",
+    "logo": "/assets/logo/7.jpg",
+    "category": "தமிழ் News"
+  },
+  {
+    "id": "uXuh15qCgGo",
+    "url": "https://www.youtube.com/live/uXuh15qCgGo?si=updated",
+    "title": "malaimurasu live",
+    "logo": "/assets/logo/12.jpg",
+    "category": "தமிழ் News"
+  },
+  {
+    "id": "NHqqu4SbhZI",
+    "url": "https://www.youtube.com/live/NHqqu4SbhZI?si=updated",
+    "title": "zee live",
+    "logo": "/assets/logo/9.jpg",
+    "category": "தமிழ் News"
   }
 ]
