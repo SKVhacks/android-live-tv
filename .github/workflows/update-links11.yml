@@ -1,8 +1,8 @@
-name: Update YouTube Tamil News Links
+name: Update YouTube Tamil News Links11
 
 on:
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '30 0 * * *'  # 6:00 AM IST = 12:30 AM UTC
   workflow_dispatch:
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
       - name: Create script directory
         run: mkdir -p scripts
 
-      - name: Create YouTube fetcher script (Python)
+      - name: Create YouTube fetcher script (Improved with Duplicate Prevention)
         run: |
           cat > scripts/youtube_fetcher.py << 'SCRIPT_EOF'
           #!/usr/bin/env python3
@@ -36,10 +36,12 @@ jobs:
           from urllib.parse import urlencode
 
           YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+
+          # Better search queries - more specific to avoid duplicates
           SEARCH_QUERIES = [
-              'tamil news live 24/7',
-              'tamil news channel live',
-              'விஸ்வாசம் நியூஸ் live'
+              'tamil news live',
+              'தமிழ் செய்திகள் live',
+              'தமிழ் news 24/7',
           ]
 
           EXISTING_CHANNELS = {
@@ -65,8 +67,30 @@ jobs:
                   print(f"Request error: {e}")
                   return None
 
+          def is_news_channel(channel_info):
+              """Verify if the channel is actually a news channel"""
+              if not channel_info:
+                  return False
+              
+              snippet = channel_info.get('snippet', {})
+              title = snippet.get('title', '').lower()
+              description = snippet.get('description', '').lower()
+              
+              news_keywords = ['Polimer News live', 'Sun News live', 'Thanthi TV live', 'malaimurasu live', 'Kalaigar news live', 'News 24/7 live tamil live','News 7 Tamil live','News 18 Tamil Nadu live','Puthiya Thalaimurai live','News J Live']
+              keyword_count = sum(1 for kw in news_keywords if kw in title or kw in description)
+              
+              return keyword_count >= 1
+
+          def is_active_channel(channel_info):
+              """Check if the channel is active"""
+              if not channel_info:
+                  return False
+              
+              description = channel_info.get('snippet', {}).get('description', '')
+              return len(description) > 10
+
           def search_channels(query):
-              """Search for YouTube channels"""
+              """Search for YouTube channels with specific criteria"""
               if not YOUTUBE_API_KEY:
                   print('⚠️  YOUTUBE_API_KEY not set. Using existing channels only.')
                   return []
@@ -76,8 +100,9 @@ jobs:
                       'part': 'snippet',
                       'q': query,
                       'type': 'channel',
-                      'maxResults': 3,
-                      'key': YOUTUBE_API_KEY
+                      'maxResults': 5,
+                      'key': YOUTUBE_API_KEY,
+                      'order': 'relevance',
                   })
                   url = f'https://www.googleapis.com/youtube/v3/search?{params}'
                   data = make_request(url)
@@ -93,7 +118,7 @@ jobs:
 
               try:
                   params = urlencode({
-                      'part': 'snippet',
+                      'part': 'snippet,statistics',
                       'id': channel_id,
                       'key': YOUTUBE_API_KEY
                   })
@@ -104,6 +129,15 @@ jobs:
               except Exception as e:
                   print(f"Error fetching channel info: {e}")
                   return None
+
+          def normalize_title(title):
+              """Normalize title for duplicate detection"""
+              normalized = title.lower().strip()
+              suffixes = [' - topic', ' topic', ' official', ' live', ' channel']
+              for suffix in suffixes:
+                  if normalized.endswith(suffix):
+                      normalized = normalized[:-len(suffix)].strip()
+              return normalized
 
           def build_channel_link(channel_id, title, logo=None, category='தமிழ் News'):
               """Build channel link object"""
@@ -120,7 +154,6 @@ jobs:
               try:
                   print('🚀 Starting YouTube links update...')
 
-                  # Start with existing channels
                   links = [
                       build_channel_link(ch_id, info['title'], info['logo'])
                       for ch_id, info in EXISTING_CHANNELS.items()
@@ -128,51 +161,94 @@ jobs:
 
                   print(f'✅ Keeping {len(links)} existing channels')
 
-                  # Fetch new channels
+                  existing_ids = set(EXISTING_CHANNELS.keys())
+                  existing_titles = {normalize_title(info['title']) for info in EXISTING_CHANNELS.values()}
+
                   if YOUTUBE_API_KEY:
                       new_channels_found = 0
-                      existing_ids = set(EXISTING_CHANNELS.keys())
-
+                      checked_channels = set()
+                      
                       for query in SEARCH_QUERIES:
-                          print(f'🔍 Searching for: "{query}"')
+                          print(f'\n🔍 Searching for: "{query}"')
                           results = search_channels(query)
+                          print(f'   Found {len(results)} results for this query')
 
                           for item in results:
                               channel_id = item['snippet']['channelId']
-
-                              if channel_id not in existing_ids and new_channels_found < 3:
-                                  channel_info = get_channel_info(channel_id)
-                                  if channel_info:
-                                      title = channel_info['snippet']['title']
-                                      new_link = build_channel_link(channel_id, title)
-                                      links.append(new_link)
-                                      existing_ids.add(channel_id)
-                                      new_channels_found += 1
-                                      print(f'  ✨ Added: {title}')
-
+                              
+                              if channel_id in checked_channels:
+                                  continue
+                              
+                              checked_channels.add(channel_id)
+                              
+                              if channel_id in existing_ids:
+                                  continue
+                              
+                              channel_info = get_channel_info(channel_id)
+                              
+                              if not channel_info:
+                                  continue
+                              
+                              title = channel_info['snippet']['title']
+                              normalized = normalize_title(title)
+                              
+                              if normalized in existing_titles:
+                                  print(f'   🔁 Skipping "{title}" (similar to existing)')
+                                  continue
+                              
+                              if not is_news_channel(channel_info):
+                                  print(f'   ❌ Skipping "{title}" (not news)')
+                                  continue
+                              
+                              if not is_active_channel(channel_info):
+                                  print(f'   ❌ Skipping "{title}" (inactive)')
+                                  continue
+                              
+                              stats = channel_info.get('statistics', {})
+                              subscriber_count = stats.get('subscriberCount', 'N/A')
+                              
+                              print(f'   ✨ Added: "{title}" ({subscriber_count} subs)')
+                              
+                              new_link = build_channel_link(channel_id, title)
+                              links.append(new_link)
+                              existing_ids.add(channel_id)
+                              existing_titles.add(normalized)
+                              new_channels_found += 1
+                              
+                              if new_channels_found >= 3:
+                                  break
+                          
                           if new_channels_found >= 3:
                               break
 
-                      print(f'📝 Found {new_channels_found} new channels')
+                      print(f'\n📝 Found {new_channels_found} new unique channels')
 
-                  # Remove duplicates and sort
-                  unique_links = {link['id']: link for link in links}.values()
-                  sorted_links = sorted(unique_links, key=lambda x: x['title'])
+                  unique_links = {}
+                  for link in links:
+                      if link['id'] not in unique_links:
+                          unique_links[link['id']] = link
+                  
+                  sorted_links = sorted(unique_links.values(), key=lambda x: x['title'])
 
-                  # Create output directory
                   output_dir = Path('src/data')
                   output_dir.mkdir(parents=True, exist_ok=True)
 
-                  # Write to file
                   output_path = output_dir / 'links.json'
                   with open(output_path, 'w', encoding='utf-8') as f:
                       json.dump(sorted_links, f, indent=2, ensure_ascii=False)
 
                   print(f'\n✅ Successfully updated {len(sorted_links)} channels in links.json')
+                  
+                  print('\n📊 Final Channel List:')
+                  for link in sorted_links:
+                      print(f'   • {link["title"]}')
+                  
                   return sorted_links
 
               except Exception as e:
                   print(f'❌ Error updating links: {e}')
+                  import traceback
+                  traceback.print_exc()
                   sys.exit(1)
 
           if __name__ == '__main__':
