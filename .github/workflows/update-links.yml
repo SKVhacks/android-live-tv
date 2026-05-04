@@ -1,4 +1,4 @@
-name: Update YouTube Tamil Live News Links123
+name: Update YouTube Tamil Live News Links
 
 on:
   schedule:
@@ -27,9 +27,7 @@ jobs:
 
       - name: Create fetcher script
         run: |
-          cat > scripts/youtube_fetcher.py << 'SCRIPT_EOF'
-          #!/usr/bin/env python3
-
+          cat > scripts/youtube_fetcher.py << 'EOF'
           import json
           import os
           import sys
@@ -38,19 +36,6 @@ jobs:
           from urllib.parse import urlencode
 
           YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
-
-          SEARCH_QUERIES = [
-              'Polimer News live',
-              'Sun News live',
-              'Thanthi TV live',
-              'malaimurasu live',
-              'Kalaigar news live',
-              'News 24/7 live tamil',
-              'News 7 Tamil live',
-              'News 18 Tamil Nadu live',
-              'Puthiya Thalaimurai live',
-              'News J Live'
-          ]
 
           EXISTING_CHANNELS = {
               '6xCrWQEcJZM': {'title': 'Polimer News', 'logo': '/assets/logo/aa.png'},
@@ -70,115 +55,66 @@ jobs:
                   with urlopen(url, timeout=10) as response:
                       return json.loads(response.read().decode('utf-8'))
               except Exception as e:
-                  print(f"❌ API ERROR: {e}")
+                  print(f"API ERROR: {e}")
                   return None
 
-          def get_live_video(query):
-              if not YOUTUBE_API_KEY:
+          def get_live_video(channel_id):
+              params = urlencode({
+                  'part': 'snippet',
+                  'channelId': channel_id,
+                  'eventType': 'live',
+                  'type': 'video',
+                  'maxResults': 1,
+                  'key': YOUTUBE_API_KEY,
+              })
+
+              url = f'https://www.googleapis.com/youtube/v3/search?{params}'
+              data = make_request(url)
+
+              if not data or 'items' not in data or len(data['items']) == 0:
                   return None
 
-              try:
-                  params = urlencode({
-                      'part': 'snippet',
-                      'q': query,
-                      'type': 'video',
-                      'eventType': 'live',
-                      'maxResults': 5,
-                      'key': YOUTUBE_API_KEY,
-                  })
+              item = data['items'][0]
 
-                  url = f'https://www.googleapis.com/youtube/v3/search?{params}'
-                  data = make_request(url)
+              return {
+                  'id': channel_id,
+                  'url': f"https://www.youtube.com/watch?v={item['id']['videoId']}",
+                  'title': EXISTING_CHANNELS[channel_id]['title'],
+                  'logo': EXISTING_CHANNELS[channel_id]['logo'],
+                  'category': 'தமிழ் News'
+              }
 
-                  if not data or 'items' not in data:
-                      return None
+          print("🔴 Fetching LIVE Tamil News...\n")
 
-                  for item in data['items']:
-                      snippet = item['snippet']
-                      title = snippet['title']
-                      channel_id = snippet['channelId']
-                      video_id = item['id']['videoId']
-
-                      if channel_id not in EXISTING_CHANNELS:
-                          continue
-
-                      if not title.upper().startswith("🔴 LIVE"):
-                          continue
-
-                      return {
-                          'id': channel_id,
-                          'url': f'https://www.youtube.com/watch?v={video_id}',
-                          'title': EXISTING_CHANNELS[channel_id]['title'],
-                          'logo': EXISTING_CHANNELS[channel_id]['logo'],
-                          'category': 'தமிழ் News'
-                      }
-
-                  return None
-
-              except Exception as e:
-                  print(f"❌ LIVE FETCH ERROR: {e}")
-                  return None
-
-
-          print("\n" + "="*60)
-          print("🔴 YOUTUBE TAMIL LIVE NEWS FETCHER")
-          print("="*60 + "\n")
-
-          try:
-              if not YOUTUBE_API_KEY:
-                  print("⚠️ Missing YOUTUBE_API_KEY")
-                  sys.exit(1)
-
-              links = []
-              seen_channels = set()
-
-              print("🔍 Checking LIVE streams...\n")
-
-              for query in SEARCH_QUERIES:
-                  print(f"🔎 {query}")
-
-                  live_video = get_live_video(query)
-
-                  if not live_video:
-                      print("   ❌ No LIVE stream")
-                      continue
-
-                  ch_id = live_video['id']
-
-                  if ch_id in seen_channels:
-                      print("   ⏭️ Duplicate skipped")
-                      continue
-
-                  print("   ✅ LIVE FOUND")
-
-                  links.append(live_video)
-                  seen_channels.add(ch_id)
-
-              final = sorted(links, key=lambda x: x['title'])
-
-              Path('src/data').mkdir(parents=True, exist_ok=True)
-
-              with open('src/data/links.json', 'w', encoding='utf-8') as f:
-                  json.dump(final, f, indent=2, ensure_ascii=False)
-
-              print(f"\n💾 SAVED: {len(final)} LIVE channels\n")
-
-              print("📺 FINAL LIVE CHANNELS:")
-              for i, link in enumerate(final, 1):
-                  print(f"   {i}. {link['title']}")
-
-              print("\n" + "="*60)
-              print("✅ DONE - ONLY LIVE CHANNELS STORED")
-              print("="*60 + "\n")
-
-          except Exception as e:
-              print(f"\n❌ FATAL ERROR: {e}")
-              import traceback
-              traceback.print_exc()
+          if not YOUTUBE_API_KEY:
+              print("❌ Missing API KEY")
               sys.exit(1)
-          SCRIPT_EOF
 
-      - name: Run update
+          links = []
+
+          for ch_id, info in EXISTING_CHANNELS.items():
+              print(f"🔎 {info['title']}")
+
+              live = get_live_video(ch_id)
+
+              if not live:
+                  print("   ❌ Not Live")
+                  continue
+
+              print("   ✅ LIVE")
+              links.append(live)
+
+          final = sorted(links, key=lambda x: x['title'])
+
+          Path('src/data').mkdir(parents=True, exist_ok=True)
+
+          with open('src/data/links.json', 'w', encoding='utf-8') as f:
+              json.dump(final, f, indent=2, ensure_ascii=False)
+
+          print(f"\n✅ Saved {len(final)} LIVE channels")
+          EOF
+
+      - name: Run script
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python3 scripts/youtube_fetcher.py
@@ -192,17 +128,11 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Commit
+      - name: Commit & Push
         if: steps.check.outputs.changed == 'true'
         run: |
           git config user.email "bot@github.com"
           git config user.name "bot"
           git add src/data/links.json
-          git commit -m "chore: update live links $(date +'%Y-%m-%d')"
+          git commit -m "update live links $(date +'%Y-%m-%d %H:%M')"
           git push
-
-      - name: Tag
-        if: steps.check.outputs.changed == 'true'
-        run: |
-          git tag "live-update-$(date +'%Y%m%d-%H%M%S')"
-          git push origin --tags
