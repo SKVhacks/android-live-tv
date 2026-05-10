@@ -190,10 +190,10 @@ export default function Home() {
         <div className="flex gap-5 overflow-x-auto px-10 py-8 items-center
           [scrollbar-width:none] [-ms-overflow-style:none]">
           {links.map((item, i) => (
-            <div key={i} ref={(el) => (cardRefs.current[i] = el)}  onClick={() => {
-    setIndex(i);
-    navigate(`/video/${item.id}`);
-  }}>
+            <div key={i} ref={(el) => (cardRefs.current[i] = el)} 
+              onClick={() => setIndex(i)}
+              onDoubleClick={() => navigate(`/video/${item.id}`)}
+             
               <ChannelList item={item} focuse={i === index} />
             </div>
           ))}
