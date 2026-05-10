@@ -94,7 +94,7 @@ This project is licensed under the **MIT License** — feel free to modify, dist
 
 ## ❤️ Developer
 
-**Vishwa S.K (Gadget_Vishwa)**  
+**Vishwa S.K (<a href="https://gadgetvishwa.vercel.app/"> Gadget_Vishwa </a>)**  
 
 If you want new features, improvements, or to report bugs,  
 👉 Feel free to **open an issue** or **DM me anytime** on GitHub.
