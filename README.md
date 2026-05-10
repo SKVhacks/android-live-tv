@@ -1,23 +1,74 @@
 # 📺 Tamil News LIVE — Android TV App
 
-Tamil News LIVE is a lightweight, fast, and intuitive **Android TV application** designed to stream Tamil news channels directly through a WebView-powered interface.It supports **remote control navigation**, **DPAD key events**,  **fullscreen immersive mode** amd **streams on FullHD [1080p]**.
+Tamil News LIVE is a lightweight, fast, and intuitive **Android  application** designed to stream Tamil news channels directly through a WebView-powered interface.It supports **remote control navigation**, **Touch**, **DPAD key events**,  **fullscreen immersive mode** amd **streams on FullHD [1080p]**.
 
 
 ## 📸 Screen Record
 [![Watch Demo](https://github.com/user-attachments/assets/873de301-7ed0-41ca-9921-786fb9e08432 )](https://jumpshare.com/share/2PO6BYdXbhtFEX7cIFmB)
 
+# Smart Features
+
+- Remembers your last selected video
+- Smooth scrolling navigation
+- TV-friendly interface
+- Fast and simple controls
+
+
+
+# Supported Devices
+
+- Android / Google TV
+- Fire TV
+- Mobile Phones
+- Tablets
+- Desktop Browsers
+- Not for Tizen OS, Web OS and fire tv stick ❌
+
+# Navigation Guide
+
+This app works on:
+
+- Keyboard
+- TV Remote / D-Pad
+- Touch Screen
+- Mouse
+
+
+
+# Keyboard & TV Remote Controls
+
+| Button | Action |
+|---|---|
+| ← Left Arrow | Move left |
+| → Right Arrow | Move right |
+| Enter / OK | Open video |
+| esc / back | Back to home|
+|double press back (only android tv) | Exit Screen pop-up |
+
+You can also hold the arrow buttons to scroll faster.
+
+
+
+# Touch Controls
+
+- Tap a card to open it
+- Swipe left or right to browse videos
+
+
+
+# Mouse Controls
+
+- Click any card to open it
+- Scroll horizontally to browse
+
+
 
 
 ## 🧩 Requirements
 
-- Works on Android TV or Android Box. Not for Tabs & Mobiles 
+- Works on Any Android Devices 
 - Android 5.0+ (API 21+)  
 - Internet connection  
-
-## 📦 Download APK
-
-👉 **[Download Latest APK](#)**  <a href="https://github.com/SKVhacks/android-live-tv/releases/download/version/Tamil_News_LIVE.apk" > Click Here</a>
-
 
 ## 🔧 Installation
 
@@ -31,6 +82,10 @@ Tamil News LIVE is a lightweight, fast, and intuitive **Android TV application**
 ```bash
 adb install TamilNewsLive.apk
 ```
+
+## 📦 Download APK
+
+👉 **[Download Latest APK](#)**  <a href="https://github.com/SKVhacks/android-live-tv/releases/download/version/Tamil_News_LIVE.apk" > Click Here</a>
 
 
 ## 📘 License
