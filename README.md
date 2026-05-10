@@ -19,10 +19,8 @@ Tamil News LIVE is a lightweight, fast, and intuitive **Android  application** d
 
 - Android / Google TV
 - Fire TV
-- Mobile Phones
-- Tablets
-- Desktop Browsers
-- Not for Tizen OS, Web OS and fire tv stick ❌
+- Mobile , Tablets
+- Not for Ios , Mac OS , Tizen OS, Web OS , fire tv stick , etc  ❌
 
 # Navigation Guide
 
