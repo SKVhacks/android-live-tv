@@ -3,9 +3,10 @@
 
 For each channel in CHANNELS, reads the channel's /streams page, finds the
 videos currently marked LIVE, and updates that entry's "id" and "url".
-If the entry's current video is still live it is kept; otherwise the live
-video with the most viewers is used. Channels with nothing live right now
-are left unchanged. Only "id" and "url" are touched.
+If the entry's current video is still live it is kept; otherwise the most
+watched live video whose title matches the channel's 24/7 pattern is used.
+If no such stream is found the entry is left unchanged, so links fixed by
+hand are never replaced by one-off streams. Only "id" and "url" are touched.
 
 Usage: python3 scripts/update_live_links.py [--dry-run]
 """
@@ -29,7 +30,7 @@ CHANNELS = {
     "News 24/7 live": ("@NewsTamil24X7TV", r"NEWS TAMIL 24x7 LIVE"),
     "News 7 Tamil": ("@news7tamil", r"News ?7 Tamil LIVE|24x7|24/7"),
     "News 18 Tamil Nadu": ("@News18Tamilnadu", r"News18 Tamil Nadu LIVE|24x7|24/7"),
-    "Puthiya Thalaimurai": ("@PuthiyaThalaimuraiTV", r"Puthiya ?Thalaimurai LIVE|24x7|24/7"),
+    "Puthiya Thalaimurai": ("@PuthiyaThalaimuraiTV", r"LIVE Puthiya ?thalaimurai|Puthiya ?thalaimurai LIVE|24x7|24/7"),
     "News J Live": ("@NewsJ", r"News ?J LIVE|24x7|24/7"),
     "zee live": ("@ZeeTamilNews", r"Zee Tamil News LIVE|24x7|24/7"),
     "sathiyam live": ("@SathiyamTV", r"Sathiyam News LIVE"),
@@ -120,19 +121,18 @@ def main():
         if not lives:
             report.append(f"KEEP  {title}: nothing live now, left {e.get('id')}")
             continue
-        named = [v for v in lives if re.search(pattern, v[2], re.I)]
-        others = [v for v in lives if not NOT_24X7.search(v[2])]
-        keep_pool = named or others
-        if e.get("id") in [v[0] for v in keep_pool]:
+        # Only switch to a stream whose title marks it as the channel's 24/7
+        # feed. Anything else (press meets, breaking clips) is ignored, so a
+        # link fixed by hand is never replaced by a short one-off stream.
+        named = [v for v in lives if re.search(pattern, v[2], re.I)
+                 and not NOT_24X7.search(v[2])]
+        if e.get("id") in [v[0] for v in lives]:
             report.append(f"OK    {title}: {e['id']} still live")
             continue
-        if named:
-            best, how = max(named, key=lambda v: v[1]), "24/7 match"
-        elif others:
-            best, how = max(others, key=lambda v: v[1]), "no 24/7 title found, most-watched live"
-        else:
-            report.append(f"KEEP  {title}: only headline streams live, left {e.get('id')}")
+        if not named:
+            report.append(f"KEEP  {title}: no 24/7 stream found, left {e.get('id')}")
             continue
+        best, how = max(named, key=lambda v: v[1]), "24/7 match"
         report.append(f"NEW   {title}: {e.get('id')} -> {best[0]} "
                       f"[{how}, {best[1]} watching] {best[2][:60]}")
         e["id"] = best[0]
