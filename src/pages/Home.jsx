@@ -2,7 +2,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ChannelList from "./ChannelList";
-import links from "../data/links.json";
+import bundledLinks from "../data/links.json";
+
+// Fresh list, kept up to date on GitHub by the nightly scheduled task.
+// The copy bundled into the build is only a fallback for when offline.
+const LINKS_URL =
+  "https://raw.githubusercontent.com/SKVhacks/android-live-tv/main/src/data/links.json";
 // import next from "../sound/change.wav";
 // import okie1 from "../sound/okie.wav";
 
@@ -18,6 +23,13 @@ export default function Home() {
   const holdDirRef = useRef(null);
 
   /* ---------------- STATE ---------------- */
+  const [links, setLinks] = useState(() => {
+    try {
+      const cached = JSON.parse(localStorage.getItem("cachedLinks"));
+      if (Array.isArray(cached) && cached.length) return cached;
+    } catch {}
+    return bundledLinks;
+  });
   const [index, setIndex] = useState(null);
   const [ytInfo, setYtInfo] = useState({
     title: "",
@@ -25,6 +37,24 @@ export default function Home() {
     thumbnail: ""
   });
 
+
+  /* ---------------- LOAD LATEST LINKS ---------------- */
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${LINKS_URL}?t=${Date.now()}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data) => {
+        if (cancelled || !Array.isArray(data) || !data.length) return;
+        setLinks(data);
+        try {
+          localStorage.setItem("cachedLinks", JSON.stringify(data));
+        } catch {}
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   /* ---------------- RESTORE INDEX ---------------- */
   useEffect(() => {
@@ -48,7 +78,8 @@ export default function Home() {
     if (index === null) return;
 
     let cancelled = false;
-    const videoId = links[index].id;
+    const videoId = links[index]?.id;
+    if (!videoId) return;
 
     const load = async () => {
       try {
@@ -84,7 +115,7 @@ export default function Home() {
 
     load();
     return () => (cancelled = true);
-  }, [index]);
+  }, [index, links]);
 
   /* ---------------- SCROLL ---------------- */
   useEffect(() => {
@@ -163,9 +194,13 @@ export default function Home() {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [index, navigate]);
+  }, [index, navigate, links]);
 
   if (index === null) return null;
+  if (index >= links.length) {
+    setIndex(0);
+    return null;
+  }
 
   /* ---------------- UI ---------------- */
   return (
@@ -193,7 +228,7 @@ export default function Home() {
             <div key={i} ref={(el) => (cardRefs.current[i] = el)} 
               onClick={() => setIndex(i)}
               onDoubleClick={() => navigate(`/video/${item.id}`)}
-             
+            >
               <ChannelList item={item} focuse={i === index} />
             </div>
           ))}
